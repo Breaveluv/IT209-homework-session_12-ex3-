@@ -1,0 +1,77 @@
+name: CD Multi-Environment
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.example.com
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Display Deployment Context
+        run: |
+          echo "=========================================="
+          echo "  DEPLOYING TO STAGING ENVIRONMENT        "
+          echo "=========================================="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Environment: staging"
+
+      - name: Deploy to Staging Server
+        run: |
+          echo "📦 Packaging and preparing artifacts for Staging..."
+          echo "🚀 Transferring deployment bundle to Staging target..."
+          sleep 3
+          echo "✅ Deployment to Staging completed successfully!"
+
+      - name: Staging Health Check
+        run: |
+          echo "🔍 Performing health check and smoke tests on Staging..."
+          echo "GET https://staging.example.com/health -> 200 OK"
+          echo "🎉 Staging environment is healthy and operational!"
+
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://api.prod.example.com
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Display Deployment Context
+        run: |
+          echo "=========================================="
+          echo "  DEPLOYING TO PRODUCTION ENVIRONMENT     "
+          echo "=========================================="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Environment: production"
+
+      - name: Deploy to Production Cluster
+        run: |
+          echo "📦 Packaging release build for Production..."
+          echo "🛡️ Initiating zero-downtime deployment to Production..."
+          sleep 5
+          echo "🚀 Production release deployed successfully to https://api.prod.example.com!"
+
+      - name: Production Health Check & Verification
+        run: |
+          echo "🔍 Running production validation and health checks..."
+          echo "GET https://api.prod.example.com/health -> 200 OK"
+          echo "🎉 Production release is live and running cleanly!"
